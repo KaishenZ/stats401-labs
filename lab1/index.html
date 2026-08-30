@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>STATS 401 - Lab 1</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <style>
+        .bar {
+            fill: #2c3e50;
+            transition: fill 0.2s;
+        }
+        .bar:hover {
+            fill: steelblue;
+        }
+        .score-label {
+            font-size: 13px;
+            font-weight: bold;
+            fill: #333;
+            text-anchor: middle;
+        }
+        .name-label {
+            font-size: 13px;
+            fill: #555;
+            text-anchor: middle;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 导航栏 -->
+    <nav class="lab-nav">
+        <a href="index.html" style="background:#333; color:white;">Lab 1</a>
+        <a href="../lab2/index.html">Lab 2</a>
+        <a href="../lab3/index.html">Lab 3</a>
+        <a href="../lab4/index.html">Lab 4</a>
+        <a href="../lab5/index.html">Lab 5</a>
+        <a href="../lab6/index.html">Lab 6</a>
+        <a href="../lab7/index.html">Lab 7</a>
+        <a href="../lab8/index.html">Lab 8</a>
+        <a href="../lab9/index.html">Lab 9</a>
+        <a href="../lab10/index.html">Lab 10</a>
+    </nav>
+
+    <h1>STATS 401: Data Acquisition and Visualization</h1>
+    <h2>Lab 1: Student Score Visualization</h2>
+    <p>A basic data-driven bar chart created with D3.js and SVG.</p>
+
+    <!-- 可视化图表容器 -->
+    <div id="chart"></div>
+
+    <p><a href="../index.html">← Back to home</a></p>
+
+    <!-- 引入 D3 库 -->
+    <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+    <script>
+        async function drawChart() {
+            // 1. 读取上级目录中的 CSV 数据并转换分数字段为数值
+            const data = await d3.csv("../data/students.csv", d => ({
+                name: d.name,
+                score: +d.score
+            }));
+
+            // 2. 画布与柱体尺寸参数
+            const width = 700;
+            const height = 300;
+            const chartBottom = 220; // 柱状图底部基准线 Y 坐标
+            const barWidth = 40;
+            const barGap = 75;       // 每个柱子的间距
+            const startX = 60;       // 起始 X 坐标
+
+            // 3. 创建 SVG 画布
+            const svg = d3.select("#chart")
+                .append("svg")
+                .attr("width", width)
+                .attr("height", height);
+
+            // 4. 绘制矩形柱子 (SVG 的 Y 轴向下增长，因此 y = 基准线 - 分数 * 倍率)
+            svg.selectAll("rect")
+                .data(data)
+                .join("rect")
+                .attr("class", "bar")
+                .attr("x", (d, i) => startX + i * barGap - barWidth / 2)
+                .attr("y", d => chartBottom - (d.score * 1.8))
+                .attr("width", barWidth)
+                .attr("height", d => d.score * 1.8)
+                .attr("rx", 3); // 轻微圆角
+
+            // 5. 绘制柱子下方的第一行文字：分数 (Score)
+            svg.selectAll(".score-label")
+                .data(data)
+                .join("text")
+                .attr("class", "score-label")
+                .attr("x", (d, i) => startX + i * barGap)
+                .attr("y", chartBottom + 25)
+                .text(d => d.score);
+
+            // 6. 绘制柱子下方的第二行文字：姓名 (Name)
+            svg.selectAll(".name-label")
+                .data(data)
+                .join("text")
+                .attr("class", "name-label")
+                .attr("x", (d, i) => startX + i * barGap)
+                .attr("y", chartBottom + 45)
+                .text(d => d.name);
+        }
+
+        drawChart();
+    </script>
+</body>
+</html>
