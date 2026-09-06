@@ -3,15 +3,144 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lab 4</title>
+    <title>Lab 4: Cleaning Web Data for Visualization</title>
+    <!-- 引入 D3.js v7 -->
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            margin: 30px auto 60px;
+            max-width: 960px;
+            line-height: 1.6;
+            color: #222;
+            padding: 0 20px;
+        }
+
+        /* 顶部返回主页链接 */
+        .back-link {
+            display: inline-block;
+            margin-bottom: 24px;
+            color: #4b0082;
+            font-size: 1.15rem;
+            text-decoration: underline;
+            font-weight: 500;
+        }
+        .back-link:hover {
+            color: #310053;
+        }
+
+        /* 页面主标题 */
+        h1.site-title {
+            font-size: 2rem;
+            font-weight: 700;
+            margin: 0 0 20px 0;
+            border-bottom: 1px solid #eaecef;
+            padding-bottom: 0.3em;
+        }
+
+        /* Lab 导航按钮组 */
+        .nav-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            padding-bottom: 18px;
+            border-bottom: 1px solid #e2e8f0;
+            margin-bottom: 30px;
+        }
+        .nav-button {
+            display: inline-block;
+            padding: 6px 14px;
+            background-color: #f1f3f5;
+            color: #333;
+            text-decoration: none;
+            border-radius: 6px;
+            font-size: 0.95rem;
+            transition: background-color 0.15s ease;
+        }
+        .nav-button:hover {
+            background-color: #e2e6ea;
+        }
+        /* 当前 Lab 4 激活高亮状态 */
+        .nav-button.active {
+            background-color: #343a40;
+            color: #ffffff;
+            font-weight: 500;
+        }
+
+        /* 图表容器与浮动提示框 */
+        #chart-container {
+            position: relative;
+            margin: 20px 0;
+        }
+        .tooltip {
+            position: absolute;
+            text-align: left;
+            padding: 10px 12px;
+            font-size: 12px;
+            background: rgba(255, 255, 255, 0.96);
+            border: 1px solid #d0d7de;
+            border-radius: 6px;
+            pointer-events: none;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            max-width: 320px;
+            z-index: 10;
+        }
+        .legend {
+            font-size: 12px;
+        }
+
+        /* 简要分析段落 (Short analysis) */
+        .short-analysis {
+            margin-top: 30px;
+            line-height: 1.7;
+            color: #24292e;
+        }
+        .short-analysis h2 {
+            font-size: 1.25rem;
+            margin-bottom: 10px;
+        }
+    </style>
 </head>
 <body>
 
-    <h1>Lab 4</h1>
+    <!-- 顶部返回主页链接 -->
+    <a href="../" class="back-link">&larr; Back to home</a>
 
-    <p>Lab 4 will be added here.</p>
+    <!-- Lab 1 - 10 导航按钮栏 (Lab 4 高亮) -->
+    <nav class="nav-container">
+        <a href="../lab1/" class="nav-button">Lab 1</a>
+        <a href="../lab2/" class="nav-button">Lab 2</a>
+        <a href="../lab3/" class="nav-button">Lab 3</a>
+        <a href="./" class="nav-button active">Lab 4</a>
+        <a href="../lab5/" class="nav-button">Lab 5</a>
+        <a href="../lab6/" class="nav-button">Lab 6</a>
+        <a href="../lab7/" class="nav-button">Lab 7</a>
+        <a href="../lab8/" class="nav-button">Lab 8</a>
+        <a href="../lab9/" class="nav-button">Lab 9</a>
+        <a href="../lab10/" class="nav-button">Lab 10</a>
+    </nav>
 
-    <a href="../index.html">Back to home</a>
+    <!-- Lab 4 规范主标题 -->
+    <h1 class="site-title">Lab 4: Cleaning Web Data for Visualization</h1>
 
+    <!-- D3 可视化图表挂载区 -->
+    <div id="chart-container">
+        <div id="vis"></div>
+        <div id="tooltip" class="tooltip" style="opacity: 0;"></div>
+    </div>
+
+    <!-- 简要分析 (Short analysis) -->
+    <div class="short-analysis">
+        <h2>Short Analysis</h2>
+        <p>
+            This visualization analyzes a dataset of 1,200 tweets curated from CardiffNLP’s TweetEval benchmark across diverse topics (Sports, News, Tech, Gaming, and General). 
+            Key cleaning steps included dropping missing records, removing duplicate tweet IDs, sanitizing text whitespaces, stripping leading "@" symbols from usernames, and converting timestamp strings into structured temporal attributes (date, hour, and weekday). 
+            Sentiment was calculated using the pre-trained CardiffNLP Twitter-RoBERTa model fine-tuned on social media text, deriving a continuous score as P(Positive) - P(Negative). 
+            The visualization encodes tweet creation time on the horizontal axis and continuous sentiment on the vertical axis, while bubble radius represents retweet volume and color denotes the predicted sentiment category. 
+            The observed pattern shows that gaming and technology discussions cluster predominantly within positive and neutral territory, whereas high-retweet outliers skew significantly negative, demonstrating how viral engagement often peaks around breaking controversies and sports events.
+        </p>
+    </div>
+
+    <script src="lab4.js"></script>
 </body>
 </html>
