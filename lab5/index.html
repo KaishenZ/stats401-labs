@@ -1,17 +1,99 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lab 5</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>STATS 401 - Lab 5</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
 </head>
 <body>
 
-    <h1>Lab 5</h1>
+  <header>
+    <h1>STATS 401: Data Acquisition and Visualization</h1>
+    <p>Lab 5 — Interactive Network Visualization</p>
+  </header>
 
-    <p>Lab 5 will be added here.</p>
+  <nav class="lab-nav">
+    <a href="../lab1/index.html">Lab 1</a>
+    <a href="../lab2/index.html">Lab 2</a>
+    <a href="../lab3/index.html">Lab 3</a>
+    <a href="../lab4/index.html">Lab 4</a>
+    <a href="index.html" style="background:#333; color:white;">Lab 5</a>
+    <a href="../lab6/index.html">Lab 6</a>
+    <a href="../lab7/index.html">Lab 7</a>
+    <a href="../lab8/index.html">Lab 8</a>
+    <a href="../lab9/index.html">Lab 9</a>
+    <a href="../lab10/index.html">Lab 10</a>
+  </nav>
 
-    <a href="../index.html">Back to home</a>
+  <main>
 
+    <section>
+      <h2>1. Dataset Description</h2>
+      <p>
+        This dataset represents a synthetic urban transit network with
+        <strong>50 stations</strong> and <strong>50 direct undirected connections</strong>.
+        Stations are described by <em>district</em>, <em>daily passengers</em>,
+        and <em>station type</em>. Connections are described by
+        <em>travel time</em> and <em>route type</em>.
+      </p>
+    </section>
+
+    <section>
+      <h2>2. Node-Link Visualization</h2>
+      <div id="chart"></div>
+      <div id="legend" class="legend"></div>
+    </section>
+
+    <section>
+      <h2>3. Node-Link Design Description</h2>
+      <p>
+        I encode <strong>district</strong> as node color, so geographic groups
+        appear as color clusters. <strong>Daily passengers</strong> is encoded
+        as node area: larger nodes represent busier stations.
+        <strong>Station type</strong> is encoded as node shape:
+        Local = circle, Transfer = square, Terminal = triangle.
+        For links, <strong>travel time</strong> is encoded as line width:
+        longer connections are wider. <strong>Route type</strong> is encoded
+        as link color. Dragging lets me untangle overlapping links.
+        Hovering a node highlights it and its direct neighbors while fading
+        everything else, and tooltips provide exact station values.
+      </p>
+    </section>
+
+    <section>
+      <h2>4. Adjacency Matrix</h2>
+      <div id="matrix"></div>
+      <div id="matrix-legend" class="legend"></div>
+    </section>
+
+    <section>
+      <h2>5. Matrix Design Description</h2>
+      <p>
+        Rows and columns both represent stations. I order stations first by
+        district (Central, North, South, East, West), then by station type
+        (Terminal, Transfer, Local), and finally by daily passengers.
+        This creates district blocks along the diagonal. A filled cell means
+        a direct connection. Cell color shows route type, and cell opacity
+        shows travel time: darker cells indicate longer travel times.
+        Row and column labels are colored by district.
+      </p>
+    </section>
+
+    <section>
+      <h2>6. Network Questions and Findings</h2>
+      <div id="findings"></div>
+    </section>
+
+    <p style="margin-top: 40px;">
+      <a href="../index.html">← Back to home</a>
+    </p>
+
+  </main>
+
+  <div id="tooltip" class="tooltip"></div>
+
+  <script src="lab5.js"></script>
 </body>
 </html>
