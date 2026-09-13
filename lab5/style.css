@@ -6,7 +6,8 @@ body {
   max-width: 1100px;
 }
 
-h1, h2 {
+h1,
+h2 {
   color: #1f3a5f;
 }
 
@@ -14,9 +15,6 @@ section {
   margin-bottom: 40px;
 }
 
-/* ============================================= */
-/* Nav bar (matching Lab 2)                       */
-/* ============================================= */
 .lab-nav {
   display: flex;
   flex-wrap: wrap;
@@ -40,17 +38,25 @@ section {
   background: #e0e0e0;
 }
 
-/* ============================================= */
-/* Chart / Matrix containers                      */
-/* ============================================= */
-#chart, #matrix {
+.lab-nav a.active {
+  background: #333;
+  color: white;
+}
+
+#chart,
+#matrix {
   margin: 16px 0;
   overflow-x: auto;
 }
 
-/* ============================================= */
-/* Tooltip                                        */
-/* ============================================= */
+.instruction,
+.section-note {
+  background: #f7f9fc;
+  border-left: 4px solid #1f3a5f;
+  padding: 10px 14px;
+  margin: 12px 0 16px;
+}
+
 .tooltip {
   position: absolute;
   opacity: 0;
@@ -65,9 +71,6 @@ section {
   transition: opacity 0.15s ease;
 }
 
-/* ============================================= */
-/* Legend                                         */
-/* ============================================= */
 .legend {
   display: flex;
   flex-wrap: wrap;
@@ -111,9 +114,22 @@ section {
   margin-right: 8px;
 }
 
-/* ============================================= */
-/* Findings                                       */
-/* ============================================= */
+.matrix-group-line {
+  stroke: #555;
+  stroke-width: 1.2;
+  stroke-dasharray: 3 3;
+  pointer-events: none;
+}
+
+.matrix-cell {
+  transition: stroke-width 0.1s ease;
+}
+
+.matrix-cell:hover {
+  stroke: #111;
+  stroke-width: 1.5;
+}
+
 #findings {
   background: #f7f9fc;
   border: 1px solid #dce3ec;
@@ -121,10 +137,52 @@ section {
   border-radius: 8px;
 }
 
-#findings p {
-  margin: 12px 0;
+.findings-grid {
+  display: grid;
+  gap: 14px;
 }
 
-#findings strong {
+.finding-card {
+  background: white;
+  border: 1px solid #dce3ec;
+  border-radius: 7px;
+  padding: 14px 16px;
+}
+
+.finding-card p {
+  margin: 7px 0;
+}
+
+.finding-question {
+  font-weight: 700;
   color: #1f3a5f;
+  font-size: 15px;
+}
+
+.finding-summary,
+.finding-note {
+  margin-top: 14px;
+  padding: 12px 14px;
+  border-radius: 6px;
+  background: white;
+  border: 1px solid #dce3ec;
+}
+
+.back-link {
+  margin-top: 40px;
+}
+
+@media (max-width: 800px) {
+  body {
+    margin: 20px;
+  }
+
+  #chart svg {
+    max-width: 100%;
+    height: auto;
+  }
+
+  .legend-section {
+    min-width: 180px;
+  }
 }

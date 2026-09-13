@@ -3,15 +3,15 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>STATS 401 - Lab 5</title>
+  <title>STATS 401  Lab 5</title>
   <link rel="stylesheet" href="style.css">
   <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
 </head>
 <body>
 
   <header>
-    <h1>STATS 401: Data Acquisition and Visualization</h1>
-    <p>Lab 5 — Interactive Network Visualization</p>
+    <h1>STATS 401  Data Acquisition and Visualization</h1>
+    <p>Lab 5  Interactive Network Visualization</p>
   </header>
 
   <nav class="lab-nav">
@@ -19,7 +19,7 @@
     <a href="../lab2/index.html">Lab 2</a>
     <a href="../lab3/index.html">Lab 3</a>
     <a href="../lab4/index.html">Lab 4</a>
-    <a href="index.html" style="background:#333; color:white;">Lab 5</a>
+    <a href="index.html" class="active">Lab 5</a>
     <a href="../lab6/index.html">Lab 6</a>
     <a href="../lab7/index.html">Lab 7</a>
     <a href="../lab8/index.html">Lab 8</a>
@@ -30,7 +30,7 @@
   <main>
 
     <section>
-      <h2>1. Dataset Description</h2>
+      <h2>1  Dataset Description</h2>
       <p>
         This dataset represents a synthetic urban transit network with
         <strong>50 stations</strong> and <strong>50 direct undirected connections</strong>.
@@ -41,53 +41,67 @@
     </section>
 
     <section>
-      <h2>2. Node-Link Visualization</h2>
+      <h2>2  Node-Link Visualization</h2>
+      <p class="instruction">
+        Drag stations to inspect overlapping connections. Hover over a station
+        to highlight its direct neighbors and view its exact values.
+      </p>
       <div id="chart"></div>
       <div id="legend" class="legend"></div>
     </section>
 
     <section>
-      <h2>3. Node-Link Design Description</h2>
+      <h2>3  Node-Link Design Description</h2>
       <p>
-        I encode <strong>district</strong> as node color, so geographic groups
-        appear as color clusters. <strong>Daily passengers</strong> is encoded
-        as node area: larger nodes represent busier stations.
-        <strong>Station type</strong> is encoded as node shape:
-        Local = circle, Transfer = square, Terminal = triangle.
-        For links, <strong>travel time</strong> is encoded as line width:
-        longer connections are wider. <strong>Route type</strong> is encoded
-        as link color. Dragging lets me untangle overlapping links.
-        Hovering a node highlights it and its direct neighbors while fading
-        everything else, and tooltips provide exact station values.
+        I encode <strong>district</strong> with node color so stations from the
+        same administrative area can be compared visually. I encode
+        <strong>daily passengers</strong> with node area because larger symbols
+        make busier stations easier to notice. I encode <strong>station type</strong>
+        with node shape so Local, Transfer, and Terminal stations remain
+        distinguishable even when their districts are similar. For links,
+        <strong>travel time</strong> is shown with line width so longer direct
+        connections stand out, while <strong>route type</strong> is shown with
+        link color so different transit services can be followed across the
+        network. Dragging helps reduce overlap and inspect local structure.
+        Hover highlighting focuses attention on one station and its direct
+        neighbors. Tooltips provide exact station values when the visual
+        encodings are not precise enough.
       </p>
     </section>
 
     <section>
-      <h2>4. Adjacency Matrix</h2>
+      <h2>4  Adjacency Matrix</h2>
       <div id="matrix"></div>
       <div id="matrix-legend" class="legend"></div>
     </section>
 
     <section>
-      <h2>5. Matrix Design Description</h2>
+      <h2>5  Matrix Design Description</h2>
       <p>
-        Rows and columns both represent stations. I order stations first by
-        district (Central, North, South, East, West), then by station type
-        (Terminal, Transfer, Local), and finally by daily passengers.
-        This creates district blocks along the diagonal. A filled cell means
-        a direct connection. Cell color shows route type, and cell opacity
-        shows travel time: darker cells indicate longer travel times.
-        Row and column labels are colored by district.
+        Rows and columns both represent stations. Stations are ordered first
+        by district, then by station type, and finally by daily passengers.
+        This ordering creates visible district blocks and makes connections
+        within and between districts easier to compare. A filled cell means
+        that the two stations have a direct connection. Cell color represents
+        route type and cell opacity represents travel time. Row and column
+        labels use district colors so the district grouping remains visible.
+        This matrix preserves connection structure while reducing the visual
+        crossing that can occur in a node-link diagram.
       </p>
     </section>
 
     <section>
-      <h2>6. Network Questions and Findings</h2>
+      <h2>6  Network Questions and Findings</h2>
+      <p class="section-note">
+        Each question reports how well the visualization supports the task,
+        which view is most useful, which encoding supports the analysis, and
+        the observation obtained from the visualization.
+      </p>
       <div id="findings"></div>
     </section>
 
-    <p style="margin-top: 40px;">
-      <a href="../index.html">← Back to home</a>
+    <p class="back-link">
+      <a href="../index.html">Back to home</a>
     </p>
 
   </main>
