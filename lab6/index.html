@@ -3,15 +3,161 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lab 6</title>
+    <title>STATS 401 - Lab 6</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <style>
+        .chart-container {
+            position: relative;
+            margin: 20px 0;
+        }
+        .tooltip {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.95);
+            border: 1px solid #ccc;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            padding: 10px 14px;
+            border-radius: 6px;
+            pointer-events: none;
+            opacity: 0;
+            font-size: 13px;
+            line-height: 1.5;
+            transition: opacity 0.15s ease;
+        }
+        /* ---- Legend ---- */
+        .legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 22px;
+            align-items: center;
+            margin: 16px 0 8px;
+            font-size: 14px;
+        }
+        .legend-title { font-weight: 600; }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .swatch {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border-radius: 3px;
+            border: 1px solid rgba(0,0,0,.25);
+        }
+        #treemapA, #treemapB { margin-bottom: 12px; }
+
+        /* ---- Design description (Part C) ---- */
+        .justification-section {
+            background: #f9fbfd;
+            border-left: 4px solid steelblue;
+            padding: 18px 24px;
+            margin-top: 35px;
+            border-radius: 0 8px 8px 0;
+            max-width: 860px;
+        }
+        .justification-section h3 {
+            margin-top: 0;
+            color: #2c3e50;
+        }
+        .justification-section p {
+            color: #444;
+            line-height: 1.6;
+        }
+
+        svg text { font-family: inherit; }
+    </style>
 </head>
 <body>
 
-    <h1>Lab 6</h1>
+    <header>
+        <h1>STATS 401: Data Acquisition and Visualization</h1>
+        <p>Lab 6 — Hierarchical Data Visualization: Trees and Treemaps</p>
+    </header>
 
-    <p>Lab 6 will be added here.</p>
+    <nav class="lab-nav">
+        <a href="../lab1/index.html">Lab 1</a>
+        <a href="../lab2/index.html">Lab 2</a>
+        <a href="../lab3/index.html">Lab 3</a>
+        <a href="../lab4/index.html">Lab 4</a>
+        <a href="../lab5/index.html">Lab 5</a>
+        <a href="index.html" style="background:#333; color:white;">Lab 6</a>
+        <a href="../lab7/index.html">Lab 7</a>
+        <a href="../lab8/index.html">Lab 8</a>
+        <a href="../lab9/index.html">Lab 9</a>
+        <a href="../lab10/index.html">Lab 10</a>
+    </nav>
 
-    <a href="../index.html">Back to home</a>
+    <main>
+        <h2>Global GDP Hierarchy — Two Treemaps</h2>
+        <p>
+            Hierarchy: World → Continent → Area → Country &nbsp;|&nbsp;
+            Rectangle <strong>area</strong> encodes GDP (billions USD),
+            rectangle <strong>color</strong> encodes GDP status.
+        </p>
+
+        <!-- ================= Legend ================= -->
+        <div class="legend">
+            <span class="legend-title">GDP Status:</span>
+            <span class="legend-item">
+                <span class="swatch" style="background:#54a24b"></span>Increase
+            </span>
+            <span class="legend-item">
+                <span class="swatch" style="background:#f1c40f"></span>Unchanged
+            </span>
+            <span class="legend-item">
+                <span class="swatch" style="background:#e45756"></span>Decrease
+            </span>
+        </div>
+
+        <!-- ================= Treemap A ================= -->
+        <h2>Treemap A — Squarify Segmentation</h2>
+        <div class="chart-container">
+            <div id="treemapA"></div>
+        </div>
+
+        <!-- ================= Treemap B ================= -->
+        <h2>Treemap B — Binary Segmentation</h2>
+        <div class="chart-container">
+            <div id="treemapB"></div>
+        </div>
+
+        <!-- ================= Part C: Design Description ================= -->
+        <section class="justification-section">
+            <h3>Design Description</h3>
+            <p>
+                In both treemaps I encode <strong>GDP amount</strong> with rectangle
+                <em>area</em> and <strong>GDP status</strong> with <em>color</em>.
+                Area is the standard visual channel for part-to-whole comparison —
+                the eye judges relative size accurately — and color is ideal for the
+                three discrete status categories, which also gives a clear legend.
+                Each treemap draws the full World → Continent → Area → Country
+                hierarchy so the reader can compare continents and areas at a glance
+                while still seeing individual countries inside them.
+            </p>
+            <p>
+                The two treemaps differ only in their spatial subdivision.
+                <strong>Treemap A</strong> uses <em>squarify</em>, which optimizes
+                aspect ratios and produces near-square rectangles. This makes
+                country-level size comparison easier because the eye can judge area
+                more precisely. <strong>Treemap B</strong> uses the <em>binary</em>
+                algorithm, which recursively splits the space into two groups. It
+                produces longer, more irregular rectangles but often respects the
+                parent–child grouping more clearly, making the continent and area
+                structure easier to trace. Comparing the two shows how the same data
+                and aggregation can be re-segmented without changing the underlying
+                information.
+            </p>
+        </section>
+
+        <p><a href="../index.html">← Back to home</a></p>
+    </main>
+
+    <!-- ================= Tooltip ================= -->
+    <div id="tooltip" class="tooltip"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+    <script src="lab6.js"></script>
 
 </body>
 </html>
