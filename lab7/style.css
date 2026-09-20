@@ -1,7 +1,5 @@
 /* =========================================================================
    Lab 7 — Animated Temporal Commercial Network  (light theme)
-   与 Lab 2 共享的 ../css/style.css 负责 header / nav / body 基础样式。
-   这里只放 Lab 7 专用样式。
    ========================================================================= */
 
 :root {
@@ -15,19 +13,13 @@
   --border:    #d5dded;
 }
 
-/* 只作用于 lab7 页面内部，不污染共享 header / nav */
-.lab7-page, body {
-  background: var(--bg);
-  color: var(--text);
-}
-
 /* -------------------------------------------------------------------------
    容器
    ------------------------------------------------------------------------- */
 main {
-  max-width: 1500px;
+  max-width: 1700px;         /* 比原来更宽，图表有更多横向空间 */
   margin: 0 auto;
-  padding: 22px 22px 60px;
+  padding: 22px 24px 60px;
 }
 
 main h2 {
@@ -40,7 +32,7 @@ main > p {
   color: #475569;
   font-size: 14px;
   line-height: 1.6;
-  max-width: 900px;
+  max-width: 1000px;
 }
 
 /* -------------------------------------------------------------------------
@@ -103,15 +95,18 @@ main > p {
 }
 
 /* -------------------------------------------------------------------------
-   布局
+   布局 —— 侧栏 300px，主图尽量宽
    ------------------------------------------------------------------------- */
 .main {
   display: grid;
-  grid-template-columns: 1fr 320px;
-  gap: 16px;
+  /* minmax(0,1fr) 防止 grid item 撑破父容器 */
+  grid-template-columns: minmax(0, 1fr) 300px;
+  gap: 18px;
   align-items: start;
 }
-@media (max-width: 1150px) {
+
+/* 窄屏时侧栏下沉到图表下方 */
+@media (max-width: 1180px) {
   .main { grid-template-columns: 1fr; }
 }
 
@@ -123,7 +118,15 @@ main > p {
   overflow: hidden;
   box-shadow: 0 1px 3px rgba(15, 23, 42, .04);
 }
-#network { display: block; width: 100%; height: auto; }
+
+/* SVG 填满容器宽度，按 viewBox 比例自适应高度 */
+#network {
+  display: block;
+  width: 100%;
+  height: auto;
+  /* 至少给一个最小高度，避免小屏时被压扁 */
+  min-height: 480px;
+}
 
 /* -------------------------------------------------------------------------
    侧栏
@@ -206,7 +209,7 @@ main > p {
   font-size: 12.5px;
   line-height: 1.55;
   color: var(--text);
-  max-width: 260px;
+  max-width: 280px;
   z-index: 999;
   box-shadow: 0 8px 24px rgba(15, 23, 42, .15);
 }
@@ -263,15 +266,15 @@ main > p {
 }
 
 /* -------------------------------------------------------------------------
-   节点标签（白底深字 + 白色描边光晕）
+   节点标签 —— 字号加大，白描边光晕加粗，避免与节点/连线重叠
    ------------------------------------------------------------------------- */
 .node-label {
-  font-size: 10.5px;
+  font-size: 12px;                    /* 11 → 12 */
   font-weight: 600;
   fill: #1f2937;
   paint-order: stroke;
-  stroke: rgba(255, 255, 255, .92);
-  stroke-width: 3.5px;
+  stroke: rgba(255, 255, 255, .95);
+  stroke-width: 4px;                  /* 3.5 → 4 */
   stroke-linejoin: round;
   pointer-events: none;
   user-select: none;

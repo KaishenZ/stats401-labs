@@ -68,7 +68,7 @@
 
         </div>
 
-        <!-- ============ ANALYSIS ============ -->
+        <!-- ============ ANALYSIS (Part E) ============ -->
         <section class="analysis">
             <h2>Assignment Part E — Temporal Network Questions</h2>
             <div class="sub">
@@ -78,93 +78,80 @@
 
             <h4>1. How does overall network connectivity change across the 60 days?</h4>
             <p>
-                Connectivity is <b>not monotonic</b> — it oscillates. Across the 60 frames the number of
-                active links typically swings between roughly <b>2 and 10</b>, and the number of active
-                companies between <b>3 and 12</b>. The animation shows a recurring pattern of
-                <b>high-activity plateaus</b> separated by <b>sparse troughs</b> where only a handful of
-                relationships remain.
+                The overall connectivity changes substantially over the 60 days rather than
+                following a consistent upward or downward trend. The number of active links
+                ranges from <b>3 to 10</b>, while the number of active companies ranges from
+                <b>6 to 12</b>. Some days have many active relationships and companies, while
+                other days contain only a few connections. The network therefore becomes more
+                connected and less connected at different points in time.
             </p>
-            <ul>
-                <li>The summary panel's <code>Active links</code> and <code>Active companies</code>
-                    give the exact value for any frame you pause on.</li>
-                <li>Because force-directed nodes keep their positions between frames, the graph visually
-                    "breathes" — it expands on busy days and contracts on quiet days — rather than
-                    jumping to a new layout.</li>
-            </ul>
+            <p>
+                The animation makes these changes visible because links appear and disappear as
+                the selected day changes. The summary panel also provides the exact number of
+                active links and companies for each day.
+            </p>
 
             <h4>2. Which companies become more central or commercially active over time?</h4>
             <p>
-                Node radius encodes <b>daily transaction volume</b>, so the largest circles mark the
-                companies carrying the most commercial value <i>on that day</i>. Watching the animation:
+                The node size represents the total transaction volume for each company on a
+                given day, so larger nodes indicate higher commercial activity.
+                <b>Fusion Electronics</b> is one of the most active companies throughout the
+                dataset and has particularly high transaction volume during the middle part of
+                the 60-day period. <b>Ion Systems</b> becomes more prominent later in the period,
+                especially during the final 20 days. <b>Cedar Retail</b> also becomes more active
+                during the later part of the dataset.
             </p>
-            <ul>
-                <li><b>Logistics and manufacturing nodes</b> generally keep the largest radii across the
-                    whole period — they are the structural backbone of the network.</li>
-                <li><b>Retail / services nodes</b> stay smaller but are almost always present, acting as
-                    connectors between the larger players.</li>
-                <li>The <b>centre of gravity shifts</b>: at certain stretches one company grows noticeably
-                    while another shrinks — the visual signature of a company becoming more commercially
-                    central at that point in time.</li>
-            </ul>
+            <p>
+                These changes show that commercial activity is not evenly distributed across
+                companies. Different companies become more prominent at different points in time,
+                which can be observed through changes in node size.
+            </p>
 
             <h4>3. Are there periods when the network consists of relatively separate clusters?</h4>
             <p>
-                Yes. On the quiet days the graph visibly <b>fragments into 2–3 disconnected
-                components</b>. These usually look like a manufacturing → logistics → retail chain on
-                one side, and an isolated services ↔ retail pair on the other, with no link bridging
-                them. When activity picks up again, a single new link fades in and the two components
-                merge back into one connected graph. So the network alternates between
-                <b>one large connected component</b> and <b>several smaller disconnected clusters</b>.
+                Yes. The network contains <b>multiple disconnected components</b> on several days.
+                Depending on the selected day, the active network can contain two, three, or four
+                separate components. For example, the network is particularly fragmented at the
+                beginning of the period, while other days contain a larger connected component
+                with only a few smaller components.
+            </p>
+            <p>
+                As new relationships appear, previously separate groups can become connected.
+                This makes the temporal animation useful for observing how the structure of the
+                network changes over time.
             </p>
 
             <h4>4. Which commercial relationships appear, disappear, or become stronger over time?</h4>
             <p>
-                The link join with a stable key (<code>source|target</code>) makes each relationship's
-                life cycle visible:
+                Many commercial relationships are <b>temporary</b> and appear only on certain days.
+                The dataset also contains <b>recurring relationships</b> that appear repeatedly
+                throughout the 60-day period. For example, several company pairs occur on a
+                regular pattern across multiple weeks rather than remaining active continuously.
             </p>
-            <ul>
-                <li><b>Persistent relationships</b> — a few pairs are present in nearly every frame.
-                    They keep a steady stroke width and never fade, indicating a long-term supply
-                    relationship.</li>
-                <li><b>Transient relationships</b> — many links appear for only 1–4 days and then fade
-                    out. In the animation these are the lines that brighten, hold for a few frames, then
-                    drop to opacity 0 and are removed from the DOM.</li>
-                <li><b>Strengthening relationships</b> — a link's stroke width is proportional to
-                    <code>amount_usd</code>, so a link that grows visibly thicker over consecutive
-                    frames is a relationship whose transaction value is increasing.</li>
-            </ul>
             <p>
-                Hovering a link shows the exact type, amount and transaction count for that day, which
-                lets you confirm which of the transaction types drives each change.
+                The strength of a relationship can also change because <b>link width represents
+                transaction amount</b>. A wider link indicates a larger transaction amount on that
+                day, while a thinner link represents a smaller amount. Therefore, changes in link
+                width provide a way to identify relationships whose transaction activity increases
+                or decreases over time. The tooltip can be used to examine the exact transaction
+                amount and count for a selected relationship.
             </p>
 
             <h4>5. Does the network become more or less cross-regional over time?</h4>
             <p>
-                The <b>Cross-region links</b> statistic in the summary panel tracks this directly.
-                The pattern is <b>activity-dependent rather than trend-dependent</b>:
+                The network does <b>not</b> show a consistent increase or decrease in cross-regional
+                activity. The proportion of cross-regional transactions varies considerably across
+                the 60 days, ranging from <b>0% on some days to 87.5% on others</b>. The average
+                proportion is also fairly similar across the three 20-day periods, although the
+                final 20 days show somewhat more cross-regional activity than the first two periods.
             </p>
-            <ul>
-                <li>On <b>high-activity days</b>, the cross-region share is at its highest — many links
-                    span different regions, so the network looks globally integrated.</li>
-                <li>On <b>low-activity days</b>, the surviving links are mostly <b>within the same
-                    region</b>, so the cross-region percentage drops sharply and the network looks
-                    locally clustered.</li>
-            </ul>
             <p>
-                In other words the network does not steadily become more or less cross-regional over the
-                60 days; instead it <b>oscillates between a globally-connected state and a
-                regionally-fragmented state</b>, driven by the same activity cycle identified in Q1 and
-                Q3.
+                This suggests that cross-regional connectivity changes with the activity of the
+                network rather than following a simple long-term trend. The cross-region statistic
+                and the regional outlines on the nodes make these changes easier to identify
+                during the animation.
             </p>
 
-            <div class="note">
-                <b>Method note.</b> These answers are supported by three encodings and two interactions:
-                node radius (dynamic volume), link width (amount), link colour (transaction type), plus
-                pause/scrub for frame-by-frame inspection and hover tooltips for exact values.
-                Because the dataset is synthetic, the specific companies and days named above should be
-                treated as illustrative — pause the animation and read the summary panel to confirm the
-                exact figures for your copy of the data.
-            </div>
         </section>
 
         <p><a href="../index.html">← Back to home</a></p>

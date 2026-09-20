@@ -4,24 +4,22 @@
    数据文件相对 index.html 的路径：
        ../data/lab7_assignment_companies.csv
        ../data/lab7_assignment_transactions_60days.csv
-
-   如果你的 index.html 在更深的目录（如 stats401-labs/labs/lab7/），
-   把下面两行的 "../data/" 改成 "../../data/"。
    ========================================================================= */
 
 const COMPANY_FILE     = "../data/lab7_assignment_companies.csv";
 const TRANSACTION_FILE = "../data/lab7_assignment_transactions_60days.csv";
 
 /* ---------- canvas geometry ---------- */
-const WIDTH  = 1080;
-const HEIGHT = 680;
-const PAD    = 40;
+/* 比例 1100 / 700 ≈ 1.57；容器越宽，图越大，节点越舒展 */
+const WIDTH  = 1100;
+const HEIGHT = 700;
+const PAD    = 55;             /* 边距略大，避免节点贴边被裁 */
 
 /* ---------- controls state ---------- */
 let currentDay = 1;
 let maxDay     = 60;
 let timer      = null;
-const FRAME_MS = 170;   // animation speed (ms per frame)
+const FRAME_MS = 170;
 
 /* ---------- svg layers ---------- */
 const svg = d3.select("#network")
@@ -38,7 +36,6 @@ const tooltip = d3.select("#tooltip");
 const fmtInt = d3.format(",");
 const fmtUSD = d => "$" + d3.format(",.0f")(d);
 
-/** Stable, order-independent key for an (undirected) link. */
 function linkKey(d) {
   const s = (d.source && d.source.id) ? d.source.id : d.source;
   const t = (d.target && d.target.id) ? d.target.id : d.target;
@@ -62,7 +59,6 @@ Promise.all([
 ])
 .then(([companyRows, transactions]) => {
 
-  /* ---- 数据校验 ---- */
   console.log("✅ Companies loaded:", companyRows.length);
   console.log("✅ Transactions loaded:", transactions.length);
   if (companyRows.length === 0)  throw new Error("companies CSV empty / parse failed");
@@ -76,7 +72,7 @@ Promise.all([
     name:    d.company_name,
     sector:  d.sector,
     region:  d.region,
-    _r:      6,
+    _r:      8,
     _active: true
   }));
 
@@ -92,12 +88,10 @@ Promise.all([
   maxDay = d3.max(transactions, d => d.day) || 60;
   const allDays = d3.range(1, maxDay + 1);
 
-  /* colour scales ------------------------------------------------------- */
   const colorSector = d3.scaleOrdinal()
     .domain(sectorList)
     .range(d3.schemeTableau10);
 
-  /* 亮色背景下区域描边色稍微加深，避免看不清 */
   const colorRegion = d3.scaleOrdinal()
     .domain(regionList)
     .range(["#d9611f", "#2f6bd1", "#0f8a52", "#7c3aed", "#b8860b", "#0891b2"]);
@@ -109,11 +103,11 @@ Promise.all([
   /* ---------------------------------------------------------------------
      3. PRE-COMPUTE PER-DAY LINK SETS + VOLUMES
      --------------------------------------------------------------------- */
-  const rawByDay    = new Map();   // day -> Map(pairKey -> merged record)
-  const dateByDay   = new Map();   // day -> Date
-  const linksByDay  = new Map();   // day -> [ link objects ]
-  const volumeByDay = new Map();   // day -> Map(companyId -> volume)
-  const activeByDay = new Map();   // day -> Set(companyId)
+  const rawByDay    = new Map();
+  const dateByDay   = new Map();
+  const linksByDay  = new Map();
+  const volumeByDay = new Map();
+  const activeByDay = new Map();
 
   transactions.forEach(t => {
     if (!dateByDay.has(t.day)) dateByDay.set(t.day, t.date);
@@ -147,7 +141,6 @@ Promise.all([
 
     if (dayMap) {
       dayMap.forEach(rec => {
-        /* dominant transaction type = 金额最大的那一类 */
         let bestType = typeList[0], bestAmt = -1;
         rec.typeCount.forEach((amt, tp) => {
           if (amt > bestAmt) { bestAmt = amt; bestType = tp; }
@@ -170,7 +163,6 @@ Promise.all([
 
     linksByDay.set(day, links);
 
-    /* 动态节点成交量 */
     const volMap = new Map(nodes.map(n => [n.id, 0]));
     const active = new Set();
 
@@ -196,37 +188,41 @@ Promise.all([
     if (l.amount > maxLinkAmount) maxLinkAmount = l.amount;
   }));
 
+  /* 节点半径范围加大：最小 7，最大 30 */
   const rScale = d3.scaleSqrt()
     .domain([0, maxVolume])
-    .range([5, 26]);
+    .range([7, 30]);
 
   const linkWidth = d3.scaleSqrt()
     .domain([0, maxLinkAmount])
-    .range([0.9, 9]);
+    .range([1.1, 10]);
 
   /* ---------------------------------------------------------------------
-     5. FORCE SIMULATION  (只创建一次 — mental map preservation)
+     5. FORCE SIMULATION —— 加强排斥，让节点分布更开
      --------------------------------------------------------------------- */
   const simulation = d3.forceSimulation(nodes)
     .force("link",
       d3.forceLink([])
         .id(d => d.id)
-        .distance(135)
-        .strength(0.28)
+        .distance(165)            /* 135 → 165 连线更长 */
+        .strength(0.24)           /* 0.28 → 0.24 稍弱，避免拉得太紧 */
     )
-    .force("charge", d3.forceManyBody().strength(-520))
+    .force("charge",
+      d3.forceManyBody()
+        .strength(-900)           /* -520 → -900 排斥更强 */
+        .distanceMax(700)
+    )
     .force("center", d3.forceCenter(WIDTH / 2, HEIGHT / 2))
     .force("collide",
       d3.forceCollide()
-        .radius(d => (d._r || 8) + 10)
-        .iterations(2)
+        .radius(d => (d._r || 10) + 16)   /* +10 → +16 半径间距更大 */
+        .iterations(3)
     )
-    .force("x", d3.forceX(WIDTH / 2).strength(0.035))
-    .force("y", d3.forceY(HEIGHT / 2).strength(0.045))
-    .alphaDecay(0.045)
-    .velocityDecay(0.52);
+    .force("x", d3.forceX(WIDTH / 2).strength(0.03))
+    .force("y", d3.forceY(HEIGHT / 2).strength(0.04))
+    .alphaDecay(0.04)
+    .velocityDecay(0.55);
 
-  /* tick — 所有元素都从持久的 node 对象取坐标 */
   simulation.on("tick", () => {
     nodes.forEach(d => {
       d.x = Math.max(PAD, Math.min(WIDTH  - PAD, d.x));
@@ -246,7 +242,7 @@ Promise.all([
     labelLayer.selectAll("text.node-label")
       .attr("x", d => d.x)
       .attr("y", d => d.y)
-      .attr("dy", d => -(d._r + 7));
+      .attr("dy", d => -(d._r + 9));   /* 标签与节点间距稍大 */
   });
 
   /* ---------------------------------------------------------------------
@@ -279,16 +275,14 @@ Promise.all([
     const volMap    = volumeByDay.get(day) || new Map();
     const activeSet = activeByDay.get(day) || new Set();
 
-    /* --- 动态节点半径 (Assignment Part B) ------------------------------ */
     nodes.forEach(n => {
       n._r      = rScale(volMap.get(n.id) || 0);
       n._active = activeSet.has(n.id);
     });
 
-    /* --- 把当天 links 交给持久的 simulation ----------------------------- */
     simulation.force("link").links(links);
 
-    /* --- LINKS : enter / update / exit --------------------------------- */
+    /* --- LINKS --- */
     linkLayer.selectAll("line")
       .data(links, linkKey)
       .join(
@@ -330,12 +324,12 @@ Promise.all([
       .on("mousemove", moveTooltip)
       .on("mouseout", hideTooltip);
 
-    /* --- NODES : enter / update --------------------------------------- */
+    /* --- NODES --- */
     nodeLayer.selectAll("circle")
       .data(nodes, d => d.id)
       .join(
         enter => enter.append("circle")
-          .attr("stroke-width", 2.5)
+          .attr("stroke-width", 3)
           .attr("cursor", "pointer")
           .attr("r", 0),
         update => update
@@ -343,7 +337,6 @@ Promise.all([
       .attr("fill",           d => colorSector(d.sector))
       .attr("stroke",         d => colorRegion(d.region))
       .attr("r",              d => d._r)
-      /* 亮色主题：不活跃节点用更轻但可见的透明度 */
       .attr("fill-opacity",   d => d._active ? 1 : 0.28)
       .attr("stroke-opacity", d => d._active ? 1 : 0.40)
       .on("mouseover", (event, d) => {
@@ -360,7 +353,7 @@ Promise.all([
       .on("mousemove", moveTooltip)
       .on("mouseout", hideTooltip);
 
-    /* --- LABELS ------------------------------------------------------- */
+    /* --- LABELS --- */
     labelLayer.selectAll("text.node-label")
       .data(nodes, d => d.id)
       .join("text")
@@ -369,7 +362,7 @@ Promise.all([
       .text(d => d.name)
       .attr("opacity", d => d._active ? 1 : 0.30);
 
-    /* --- SUMMARY PANEL ------------------------------------------------ */
+    /* --- SUMMARY --- */
     const totalValue  = d3.sum(links, d => d.amount);
     const totalCount  = d3.sum(links, d => d.count);
     const crossRegion = links.filter(d => d.crossRegion).length;
@@ -386,19 +379,18 @@ Promise.all([
       <div class="stat"><span>Cross-region links</span><b>${crossRegion} (${crossPct.toFixed(0)}%)</b></div>
     `);
 
-    /* --- UI SYNC ------------------------------------------------------ */
+    /* --- UI SYNC --- */
     d3.select("#day-label").text(`Day ${day}`);
     d3.select("#date-label").text(dateStr);
     d3.select("#time-slider").property("value", day);
 
-    /* --- 温和 re-heat (mental-map preservation) ------------------------ */
     if (links.length > 0) {
       simulation.alpha(0.12).restart();
     }
   }
 
   /* ---------------------------------------------------------------------
-     8. ANIMATION CONTROLS (Assignment Part C)
+     8. ANIMATION CONTROLS
      --------------------------------------------------------------------- */
   function play() {
     if (timer) return;
@@ -406,7 +398,7 @@ Promise.all([
 
     d3.select("#play").classed("active", true);
 
-    showDay(currentDay);           // 立即渲染当前帧
+    showDay(currentDay);
 
     timer = d3.interval(() => {
       if (currentDay >= maxDay) {
@@ -438,11 +430,10 @@ Promise.all([
     .attr("max", maxDay)
     .attr("value", 1)
     .on("input", function () {
-      pause();                       // 手动拖动时暂停动画
+      pause();
       showDay(+this.value);
     });
 
-  /* 键盘：空格 = 播放/暂停，左右键 = 步进 */
   d3.select(window).on("keydown", (event) => {
     if (event.code === "Space") {
       event.preventDefault();
@@ -487,21 +478,21 @@ Promise.all([
 
   legend.append("h3").text("Size & width");
   const sizeRow  = legend.append("div").attr("class", "legend-row");
-  const sizeSvg  = sizeRow.append("svg").attr("width", 120).attr("height", 34);
-  sizeSvg.append("circle").attr("cx", 14).attr("cy", 17).attr("r", 6)
-    .attr("fill", "#2f6bd1").attr("stroke", "#d9611f").attr("stroke-width", 2);
-  sizeSvg.append("circle").attr("cx", 62).attr("cy", 17).attr("r", 13)
-    .attr("fill", "#2f6bd1").attr("stroke", "#d9611f").attr("stroke-width", 2);
-  sizeSvg.append("text").attr("x", 84).attr("y", 21)
+  const sizeSvg  = sizeRow.append("svg").attr("width", 140).attr("height", 40);
+  sizeSvg.append("circle").attr("cx", 16).attr("cy", 20).attr("r", 8)
+    .attr("fill", "#2f6bd1").attr("stroke", "#d9611f").attr("stroke-width", 2.5);
+  sizeSvg.append("circle").attr("cx", 75).attr("cy", 20).attr("r", 15)
+    .attr("fill", "#2f6bd1").attr("stroke", "#d9611f").attr("stroke-width", 2.5);
+  sizeSvg.append("text").attr("x", 96).attr("y", 24)
     .attr("fill", "#5b6b84").attr("font-size", 11).text("volume");
 
   const sizeRow2 = legend.append("div").attr("class", "legend-row");
-  const sizeSvg2 = sizeRow2.append("svg").attr("width", 120).attr("height", 20);
-  sizeSvg2.append("line").attr("x1", 6).attr("y1", 10).attr("x2", 34).attr("y2", 10)
-    .attr("stroke", "#666").attr("stroke-width", 1.2).attr("stroke-linecap", "round");
-  sizeSvg2.append("line").attr("x1", 40).attr("y1", 10).attr("x2", 96).attr("y2", 10)
-    .attr("stroke", "#666").attr("stroke-width", 6).attr("stroke-linecap", "round");
-  sizeSvg2.append("text").attr("x", 100).attr("y", 14)
+  const sizeSvg2 = sizeRow2.append("svg").attr("width", 140).attr("height", 22);
+  sizeSvg2.append("line").attr("x1", 6).attr("y1", 11).attr("x2", 38).attr("y2", 11)
+    .attr("stroke", "#666").attr("stroke-width", 1.4).attr("stroke-linecap", "round");
+  sizeSvg2.append("line").attr("x1", 46).attr("y1", 11).attr("x2", 112).attr("y2", 11)
+    .attr("stroke", "#666").attr("stroke-width", 7).attr("stroke-linecap", "round");
+  sizeSvg2.append("text").attr("x", 116).attr("y", 15)
     .attr("fill", "#5b6b84").attr("font-size", 11).text("amount");
 
   legend.append("div")
@@ -525,10 +516,8 @@ Promise.all([
       <b>排查步骤：</b><br>
       1. DevTools → Network → 过滤 <code>csv</code>，看请求是 200 还是 404。<br>
       2. 浏览器地址栏直接试：
-         <code>http://localhost:8000/data/lab7_assignment_companies.csv</code>，
-         看能否下载。<br>
+         <code>http://localhost:8000/data/lab7_assignment_companies.csv</code>。<br>
       3. 如果 <code>../data/</code> 不行，试 <code>../../data/</code>。<br>
-      4. 确认 <code>index.html</code> 与 <code>data/</code> 的相对层级。
     </div>
   `);
 });
