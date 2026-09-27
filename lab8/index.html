@@ -3,15 +3,211 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lab 8</title>
+    <title>STATS 401 - Lab 8</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <h1>Lab 8</h1>
+    <header>
+        <h1>STATS 401: Data Acquisition and Visualization</h1>
+        <p>Lab 8 — Web Text Data and Visualization</p>
+    </header>
 
-    <p>Lab 8 will be added here.</p>
+    <nav class="lab-nav">
+        <a href="../lab1/index.html">Lab 1</a>
+        <a href="../lab2/index.html">Lab 2</a>
+        <a href="../lab3/index.html">Lab 3</a>
+        <a href="../lab4/index.html">Lab 4</a>
+        <a href="../lab5/index.html">Lab 5</a>
+        <a href="../lab6/index.html">Lab 6</a>
+        <a href="../lab7/index.html">Lab 7</a>
+        <a href="index.html" style="background:#333; color:white;">Lab 8</a>
+        <a href="../lab9/index.html">Lab 9</a>
+        <a href="../lab10/index.html">Lab 10</a>
+    </nav>
 
-    <a href="../index.html">Back to home</a>
+    <main>
+        <h2>1. Bulletin and Corpus</h2>
+        <p>
+            The corpus is the <em>Bulletin of Duke Kunshan University Undergraduate Instruction</em>,
+            2021–22 edition. The file is <code>V2021-22_DKU_UG_Bulletin.pdf</code>
+            (PDF dated 23 August 2021, 400 pages). The same edition is published at
+            <a href="https://dku-web-admissions.s3.cn-north-1.amazonaws.com.cn/dkumain/files/V2021-22_DKU_UG_Bulletin.pdf">the DKU admissions copy</a>.
+            Date accessed: 27 September 2026.
+        </p>
+        <p>
+            One paragraph, or one short policy block, is one passage. A word, a page, or a whole chapter is not a unit.
+            Each passage keeps <code>chapter</code>, <code>section</code>, <code>subsection</code>, <code>page</code>, and <code>text</code>.
+            Chapter is the Part heading. Section is the next heading in the bulletin outline. Subsection is the smaller heading, including a course title when the passage is a course description.
+        </p>
+        <dl class="stats">
+            <div><dt>Raw passages</dt><dd>1,795</dd></div>
+            <div><dt>After removing duplicate text</dt><dd>1,359</dd></div>
+            <div><dt>After cleaning</dt><dd>1,208</dd></div>
+            <div><dt>Average length</dt><dd>79 words</dd></div>
+            <div><dt>Formal sections</dt><dd>84</dd></div>
+            <div><dt>Chapters</dt><dd>12</dd></div>
+        </dl>
+        <p class="note">
+            Cleaning drops the cover and table of contents (pages 1–9), footer page numbers, duplicate paragraphs,
+            fragments shorter than 8 words, and the chancellor’s signature line.
+            Stop words were not removed, and the text was not lemmatized, because the embedding model reads the whole sentence.
+        </p>
 
+        <h2>2. Corpus Overview</h2>
+        <p class="note">Two corpus summaries: how passages are distributed across formal sections, and which terms distinguish passages under TF-IDF.</p>
+        <div class="overview">
+            <div>
+                <h3>Passages by section</h3>
+                <svg id="section-chart"></svg>
+            </div>
+            <div>
+                <h3>Top TF-IDF terms</h3>
+                <svg id="term-chart"></svg>
+            </div>
+        </div>
+
+        <h2>3. Semantic Embedding Map</h2>
+        <p class="note">
+            Model: <code>all-MiniLM-L6-v2</code> (384 dimensions, normalized).
+            Projection: UMAP, cosine distance, 15 neighbors, min_dist 0.15, seed 401.
+            Topics: k-means on the original vectors, 8 clusters, seed 401.
+            Position is that projection. Color is the topic. Point area is passage length.
+            The axes are not separate semantic variables. Nearby points tend to mean similar things.
+        </p>
+
+        <div class="controls">
+            <input type="text" id="search" placeholder="Search bulletin...">
+            <select id="chapter-filter"><option value="">All chapters</option></select>
+            <select id="section-filter"><option value="">All sections</option></select>
+            <select id="topic-filter"><option value="">All topics</option></select>
+            <button id="reset" type="button">Reset</button>
+            <span id="visible-count"></span>
+        </div>
+
+        <div id="legend"></div>
+
+        <div class="workspace">
+            <div class="chart-wrap">
+                <svg id="map"></svg>
+            </div>
+            <aside id="detail-panel">
+                <p class="placeholder">Click a passage on the map, or a cell in the matrix below.</p>
+            </aside>
+        </div>
+
+        <h2>4. Topic × Bulletin Section</h2>
+        <p class="note">
+            Rows are formal sections, ordered by how many passages they contain.
+            Columns are semantic topics. A darker cell means more passages.
+            Click a cell to highlight those passages on the map.
+        </p>
+        <div class="matrix-scroll">
+            <svg id="matrix"></svg>
+        </div>
+        <div id="tooltip"></div>
+
+        <h2>5. Semantic Findings</h2>
+        <p class="note">
+            The counts below are the 1,208 passages drawn on this page.
+            A page number is not printed on the dot. Click the point and the detail panel shows Page.
+            The two similarity scores are the cosine similarity of neighbor pairs the panel lists. The chart itself does not print that score.
+        </p>
+
+        <h3>What are the major semantic topics?</h3>
+        <p>
+            The legend has eight colors. The larger groups are course fields:
+            Natural Science and Computation (211 passages), Politics and Global Affairs (203),
+            Environment, Health, and Policy (164), Media and Arts (153), and China, History, and Culture (129).
+            Language and Communication is smaller (83). Most of those points are Mandarin, writing, and skills courses.
+            Two colors are rules rather than majors: Credits, Load, and Grading (166) and University Policy and Transfer Credit (99).
+            Most points come from Part 10, Majors and Courses, so the field colors take up more of the map.
+            The gold and dark-blue points are mostly in the earlier policy parts.
+        </p>
+
+        <h3>Which topics appear across multiple formal sections?</h3>
+        <p>
+            In the matrix, Credits, Load, and Grading appears in 41 sections, and 22 of those sections have at least two passages in that color.
+            University Policy and Transfer Credit appears in 57 sections, and 15 of those have at least two passages.
+            Those two columns are light marks down many rows.
+            The field columns are different. Politics and Global Affairs is in only four sections, and almost all of its passages are in Course Descriptions or Majors.
+            Science, China, Environment, and Media follow the same pattern: dark cells in the first two rows, and empty cells in most policy rows.
+        </p>
+
+        <h3>Which formal sections contain the most semantically diverse content?</h3>
+        <p>
+            Course Descriptions has all eight colors, across 630 passages. Majors has six colors, across 300 passages.
+            Those two sections are catalogs, so the mix is what you would expect from a list of different subjects.
+            The shorter sections mix less. Key Components has five topics in 14 passages. Degree Requirements has four topics in 23 passages.
+            Registration is mostly one color: four of its five passages are Credits, Load, and Grading.
+        </p>
+
+        <h3>Which passages from different sections are semantically similar?</h3>
+        <p>
+            Pages 57 and 59 are two sections, one for the classes of 2022–2024 and one for the class of 2025 and beyond.
+            Both say that a student whose record shows marginal scholarship “will be subject either to academic warning or academic probation.”
+            Both points are Credits, Load, and Grading. Click either point and the other passage is in the five nearest neighbors.
+            Their cosine similarity is 0.995.
+        </p>
+        <p>
+            Another pair comes from different parts. On page 75, in Office of Global Education and Study Away, one passage says students may transfer up to 40 credits taken off campus.
+            On page 25, under Undergraduate Signature Work, the credit rules include “no more than 40 credits combining any allowable transfer credits,” along with the 136 credits required for the degree.
+            Both points are University Policy and Transfer Credit, and their similarity is 0.86.
+            One passage is filed with study away. The other is filed with degree requirements.
+        </p>
+
+        <h3>Which passages appear unusual relative to their formal section?</h3>
+        <p>
+            Partners has seven passages. Five of them describe Duke, Wuhan University, and Kunshan, and those are University Policy and Transfer Credit.
+            Page 12 is the exception: “Its campus is regarded as one of the most beautiful in the country, boasting palatial buildings that blend Eastern and Western architectural styles.”
+            That point is Media and Arts.
+        </p>
+        <p>
+            Estimated Expenses has 18 passages. Fifteen are Credits, Load, and Grading, mostly tuition and housing amounts.
+            Page 32 is about a flight to Shanghai, visa costs, and “registration costs associated with establishing legal residence in China.”
+            That point is China, History, and Culture.
+        </p>
+        <p>
+            On page 36, Academic Integrity has two passages under one heading.
+            The passage about signing the Community Standard is University Policy and Transfer Credit.
+            The next passage, about faculty consulting the Dean on academic misconduct, is Credits, Load, and Grading.
+        </p>
+
+        <h3>Do credit, graduation, registration, and academic integrity occupy one region?</h3>
+        <p>
+            No. Searching credit leaves 126 passages bright, in six colors.
+            78 are Credits, Load, and Grading, and 37 are University Policy and Transfer Credit.
+            A few fall in Language, China, Science, or Environment.
+            Degree credit and transfer credit are not the same part of the map.
+            Searching graduation leaves 28 passages, and only those two policy colors: 16 and 12.
+        </p>
+        <p>
+            Searching registration leaves 8 passages. Five are Credits, Load, and Grading, including the registration instructions on pages 41 and 42.
+            Two are University Policy and Transfer Credit: Compliance with Academic Regulations, and International Student Services.
+            The last one is the page 32 travel paragraph. There, registration means the cost of legal residence in China, so the point is China, History, and Culture.
+        </p>
+        <p>
+            The exact words academic integrity appear twice.
+            On page 36, in the Community Standard passage (University Policy and Transfer Credit), faculty are told to deal fairly with a possible violation of academic integrity.
+            On page 66, in Procedure for Resolution of Students’ Academic Concerns (Credits, Load, and Grading), integrity cases are sent to the Undergraduate Academic Integrity Policy.
+            The word integrity also appears in Who We Are, the Community Standard, and Student Conduct. Those passages are mostly University Policy and Transfer Credit.
+            The two exact matches are not the same color, and neither one sits with the course fields.
+        </p>
+
+        <h2>6. Design Description</h2>
+        <p>
+            Each cleaned passage was embedded with all-MiniLM-L6-v2, a sentence-transformer model, without stop-word removal or lemmatization. The model keeps the whole sentence, so function words stay in. Every passage becomes a normalized 384-dimensional vector, and cosine similarity is the measure of closeness. K-means with eight clusters and random seed 401 was fit to those original vectors, not to the two-dimensional coordinates. UMAP then laid the same vectors out for the map, using cosine distance, 15 neighbors, a minimum distance of 0.15, and seed 401. The axes are only a layout. Nearness is what can be read, and it can be checked by opening a point and reading its five nearest neighbors.
+        </p>
+        <p>
+            Labels were assigned after inspection rather than copied from the bulletin’s headings. For each cluster I read passages near the center and the terms with the highest average TF-IDF. Those cues produced names such as Credits, Load, and Grading and China, History, and Culture. TF-IDF helps name a cluster. It does not place the points.
+        </p>
+        <p>
+            On the map, position is the UMAP projection, color is the topic, and point area is passage length in words. The matrix uses formal sections as rows and topics as columns. A darker cell means more passages, and the tooltip adds the count and the section’s share. Clicking a cell highlights those passages on the map. Clicking a point highlights its matrix cell and lists neighbors that may sit in another section. That link is how the outline and the semantic neighborhoods answer the same question: where a passage was filed, and which other passages mean something similar.
+        </p>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+    <script src="lab8.js"></script>
 </body>
 </html>
