@@ -3,15 +3,75 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lab 9</title>
+    <title>Lab 9 — Geospatial Visualization with D3</title>
+    <!-- D3.js v7 and TopoJSON Client -->
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="https://unpkg.com/topojson-client@3/dist/topojson-client.min.js"></script>
+    <link rel="stylesheet" href="lab9.css">
 </head>
 <body>
+    <header class="container">
+        <h1>Lab 9: Geospatial Visualization</h1>
+        <p class="subtitle">STATS 401: Data Acquisition and Visualization</p>
+    </header>
 
-    <h1>Lab 9</h1>
+    <main class="container">
+        <!-- Section 1: Dataset Description -->
+        <section id="dataset-description" class="card">
+            <h2>1. Dataset Description</h2>
+            <p>
+                This lab explores the <strong>2025 nominal Gross Domestic Product (GDP)</strong> for the world's 50 largest economies based on the <em>IMF World Economic Outlook (October 2025)</em> database. The dataset includes country ISO-3 identifiers, standardized country names, projected nominal GDP in billions of U.S. dollars, and economic ranks.
+            </p>
+            <p>
+                Countries outside the top 50 are represented in neutral light gray to signify <em>"No Data"</em> rather than zero economic output, preventing misleading visual interpretations.
+            </p>
+        </section>
 
-    <p>Lab 9 will be added here.</p>
+        <!-- Visualizations Grid -->
+        <div class="grid-container">
+            <!-- Section 2: Choropleth Map -->
+            <section class="card viz-card">
+                <h2>2. 2025 GDP Choropleth Map</h2>
+                <p class="caption">
+                    Color represents GDP magnitude using a square-root color scale to handle heavy skewness, while preserving authentic geographic boundaries. Drag to pan, scroll to zoom.
+                </p>
+                <div id="choropleth" class="viz-wrapper">
+                    <div class="loading-indicator">Loading geographic map...</div>
+                </div>
+            </section>
 
-    <a href="../index.html">Back to home</a>
+            <!-- Section 3: Cartogram -->
+            <section class="card viz-card">
+                <h2>3. 2025 GDP Cartogram (Dorling Area Encoding)</h2>
+                <p class="caption">
+                    Visual area represents 2025 nominal GDP. Geographic boundary accuracy is sacrificed to accurately reflect quantitative economic dominance. Hover to cross-inspect.
+                </p>
+                <div id="cartogram" class="viz-wrapper">
+                    <div class="loading-indicator">Loading cartogram...</div>
+                </div>
+            </section>
+        </div>
 
+        <!-- Section 4: Design and Comparison -->
+        <section id="analysis-comparison" class="card">
+            <h2>4. Design and Comparison</h2>
+            <div class="essay-content">
+                <p>
+                    In the choropleth map, geographically extensive nations such as Russia, Canada, Australia, and Brazil naturally dominate visual attention regardless of their relative economic output. Conversely, the cartogram dramatically shifts prominence toward economic superpowers: the United States and China expand massively into commanding visual anchors, while compact advanced economies like Germany, Japan, the United Kingdom, and South Korea swell significantly compared to their physical landmasses. Meanwhile, land-rich countries with smaller economies shrink noticeably.
+                </p>
+                <p>
+                    The choropleth preserves geographic verifiability, spatial contiguity, land orientation, and recognizable territorial borders. However, this comes at the expense of quantitative perceptibility, as vast geographic areas can visually overwhelm dense economic hubs. The cartogram trades spatial accuracy and boundary fidelity for quantitative proportionality, encoding GDP directly into readable visual area.
+                </p>
+                <p>
+                    Consequently, the choropleth best supports macro-regional queries and spatial pattern identification (e.g., assessing economic distribution across Western Europe or Southeast Asia). The cartogram excels at comparative magnitude estimation, revealing actual global economic concentration without land-area bias. Switching visual encodings from color luminance to geometric area transforms our perception: global economic power is not distributed evenly across continents, but is intensely concentrated in a handful of high-density production hubs.
+                </p>
+            </div>
+        </section>
+    </main>
+
+    <!-- Shared Tooltip -->
+    <div id="tooltip" class="tooltip"></div>
+
+    <script src="lab9.js"></script>
 </body>
 </html>
