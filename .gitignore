@@ -3,3 +3,8 @@
 .DS_Store
 .venv/
 .DS_Store
+node_modules/
+__pycache__/
+*.pyc
+.venv/
+.DS_Store
