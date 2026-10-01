@@ -241,3 +241,17 @@ svg {
 .back-link a:hover {
     text-decoration: underline;
 }
+
+.card-footer-note {
+    margin-top: 14px;
+    padding: 12px 14px;
+    background-color: #f8fafc;
+    border-left: 3px solid #3b82f6;
+    border-radius: 0 6px 6px 0;
+    font-size: 0.84rem;
+    color: #334155;
+    line-height: 1.5;
+}
+.card-footer-note strong {
+    color: #0f172a;
+}

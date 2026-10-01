@@ -4,9 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>STATS 401 - Lab 9</title>
-    <!-- 仅引入独立的 lab9.css，避免全局 style.css 的宽度与左对齐污染 -->
     <link rel="stylesheet" href="lab9.css">
-    <!-- D3 与 TopoJSON -->
     <script src="https://d3js.org/d3.v7.min.js"></script>
     <script src="https://unpkg.com/topojson-client@3/dist/topojson-client.min.js"></script>
 </head>
@@ -18,7 +16,7 @@
             <p>Lab 9 — Geospatial Visualization with D3</p>
         </header>
 
-        <!-- Lab 导航栏（绝对水平居中） -->
+        <!-- Lab 导航栏 -->
         <nav class="lab-nav">
             <a href="../lab1/index.html">Lab 1</a>
             <a href="../lab2/index.html">Lab 2</a>
@@ -37,10 +35,10 @@
             <section id="dataset-description" class="card">
                 <h2>1. Dataset Description</h2>
                 <p>
-                    This lab explores the <strong>2025 nominal Gross Domestic Product (GDP)</strong> for the world's 50 largest economies based on the <em>IMF World Economic Outlook (October 2025)</em> database. The dataset includes country ISO-3 identifiers, standardized country names, projected nominal GDP in billions of U.S. dollars, and economic ranks.
+                    This lab explores the <strong>2025 nominal Gross Domestic Product (GDP)</strong> for the world's 50 largest economies based on the <em>IMF World Economic Outlook (October 2025)</em> database. The dataset includes country ISO-3 identifiers, standardized country names, projected nominal GDP in billions of U.S. dollars, and economic ranks[cite: 1].
                 </p>
                 <p>
-                    Countries outside the top 50 are represented in neutral light gray to signify <em>"No Data"</em> rather than zero economic output, preventing misleading visual interpretations.
+                    Countries outside the top 50 are represented in neutral light gray to signify <em>"No Data"</em> rather than zero economic output, preventing misleading visual interpretations[cite: 1].
                 </p>
             </section>
 
@@ -50,10 +48,14 @@
                 <section class="card viz-card">
                     <h2>2. 2025 GDP Choropleth Map</h2>
                     <p class="caption">
-                        Color represents GDP magnitude using a square-root color scale to handle heavy skewness, while preserving authentic geographic boundaries. Drag to pan, scroll to zoom, click to pin.
+                        Color represents GDP magnitude using a logarithmic color scale to handle heavy skewness, while preserving authentic geographic boundaries. Drag to pan, scroll to zoom, click to pin.
                     </p>
                     <div id="choropleth" class="viz-wrapper">
                         <div class="loading-indicator">Loading geographic map...</div>
+                    </div>
+                    <!-- Part B 设计决策回答 -->
+                    <div class="card-footer-note">
+                        <strong>Scale Design Justification (Part B):</strong> A logarithmic color scale was chosen over a linear scale to address severe right-skewness. In a linear scale, the massive economies of the US (~$30.8T) and China (~$19.6T) dominate the entire gamut, compressing the remaining 48 economies into visually indistinguishable pale hues. The log scale stretches visual variance evenly across orders of magnitude ($300B–$5,000B) and enables meaningful differentiation among middle-tier nations.
                     </div>
                 </section>
 
@@ -66,21 +68,25 @@
                     <div id="cartogram" class="viz-wrapper">
                         <div class="loading-indicator">Loading cartogram...</div>
                     </div>
+                    <!-- Part C 面积编码与设计说明 -->
+                     <div class="card-footer-note">
+                        <strong>Area Encoding Note (Part C):</strong> Country circle area is strictly proportional to projected nominal GDP (Area ∝ GDP, radius ∝ &radic;GDP). Circle centroids are initialized at true geographic positions and relaxed via a force-directed collision simulation, preserving relative geopolitical proximity while preventing visual overlap.
+                    </div>
                 </section>
             </div>
 
-            <!-- Section 4: Design and Comparison -->
+            <!-- Section 4: Design and Comparison (严格 150-250 词) -->
             <section id="analysis-comparison" class="card">
                 <h2>4. Design and Comparison</h2>
                 <div class="essay-content">
                     <p>
-                        In the choropleth, geographically extensive nations such as Russia, Canada, Australia, and Brazil naturally dominate spatial attention through sheer physical footprint, while the United States and China dominate the color luminance channel with the deepest saturation. In the cartogram, the United States and China expand into commanding visual anchors. However, the most striking change is the inflation of compact yet affluent economies such as Singapore, Switzerland, Ireland, the Netherlands, and Hong Kong SAR ,which grow to sizes comparable with Germany or India. Conversely, land-rich nations with relatively smaller economies like Russia, Canada, Kazakhstan, Algeria, and Nigeria shrink sharply, revealing that their geographic area vastly exceeds their economic weight.
+                        In the choropleth, geographically extensive nations such as Russia, Canada, Australia, and Brazil naturally dominate spatial attention through sheer physical footprint, while the United States and China dominate the color luminance channel with the deepest saturation. In the cartogram, the United States and China expand into commanding visual anchors; however, the most striking shift is the inflation of compact yet affluent economies—such as Singapore, Switzerland, Ireland, the Netherlands, and Hong Kong SAR—which swell into sizes visually comparable to major regional players. Conversely, land-rich nations with relatively smaller economies shrink sharply, revealing the substantial mismatch between land area and economic weight.
                     </p>
                     <p>
-                        The choropleth preserves coastlines, borders, adjacency, and regional clustering, but it under-represents compact high-GDP economies. The cartogram distorts shape, orientation, and territory, but encodes GDP directly as perceivable area.
+                        The choropleth preserves coastlines, actual borders, adjacency, and regional clustering, though it severely under-represents spatially compact high-GDP economies. To address severe right-skewness where the top two economies dwarf the rest, a logarithmic color scale was chosen over a linear scale, distributing visual variance evenly and preventing middle-tier economies from collapsing into identical light shades. In contrast, the cartogram intentionally sacrifices geographic shape, orientation, and territory to encode GDP directly into readable visual area.
                     </p>
                     <p>
-                        Consequently, the choropleth best supports spatial exploration tasks, such as assessing geopolitical contiguity or regional economic patterns across Western Europe and Southeast Asia. The cartogram best supports quantitative magnitude comparisons, such as estimating the economic disparity between rank-3 and rank-15 economies without landmass bias. Switching from color encoding to area encoding fundamentally transforms perception that global economic output is not spread across spread across continents, but is intensely concentrated within a handful of high-output economies.
+                        Consequently, the choropleth best supports spatial exploration tasks, such as assessing geopolitical contiguity or regional economic patterns across Western Europe and Southeast Asia. The cartogram best supports quantitative magnitude comparisons, such as estimating the economic disparity between rank-3 and rank-15 economies without landmass bias. Switching from color encoding to area encoding fundamentally transforms perception: global economic output is not spread across broad continental landmasses, but is intensely concentrated within a handful of high-density nodes.
                     </p>
                 </div>
             </section>
