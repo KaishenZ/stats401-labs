@@ -3,15 +3,167 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lab 10</title>
+    <title>STATS 401 - Lab 10</title>
+    <link rel="stylesheet" href="lab10.css">
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="https://unpkg.com/topojson-client@3/dist/topojson-client.min.js"></script>
 </head>
 <body>
 
-    <h1>Lab 10</h1>
+    <div class="page-wrapper">
+        <header>
+            <h1>STATS 401: Data Acquisition and Visualization</h1>
+            <p>Lab 10 — Novel Interaction with Visualizations (Voice-Controlled Geospatial Exploration)</p>
+        </header>
 
-    <p>Lab 10 will be added here.</p>
+        <!-- Lab 导航栏 -->
+        <nav class="lab-nav">
+            <a href="../lab1/index.html">Lab 1</a>
+            <a href="../lab2/index.html">Lab 2</a>
+            <a href="../lab3/index.html">Lab 3</a>
+            <a href="../lab4/index.html">Lab 4</a>
+            <a href="../lab5/index.html">Lab 5</a>
+            <a href="../lab6/index.html">Lab 6</a>
+            <a href="../lab7/index.html">Lab 7</a>
+            <a href="../lab8/index.html">Lab 8</a>
+            <a href="../lab9/index.html">Lab 9</a>
+            <a href="index.html" class="active">Lab 10</a>
+        </nav>
 
-    <a href="../index.html">Back to home</a>
+        <main>
+            <!-- Section 1: Novel Interaction & Voice Control Hub -->
+            <section id="interaction-hub" class="card">
+                <div class="hub-header">
+                    <div>
+                        <h2>1. Voice Interaction & Fallback Control Center</h2>
+                        <p class="caption">
+                            Extend Lab 9's 2025 GDP Choropleth &amp; Cartogram with Web Speech API voice commands. The microphone only activates upon explicit user action.
+                        </p>
+                    </div>
+                    <button id="voice-button" class="voice-btn" type="button">
+                        <span class="mic-icon">🎤</span>
+                        <span id="voice-btn-text">Start Voice Control</span>
+                    </button>
+                </div>
 
+                <!-- 实时语音反馈面板 (Task 5 & Part C) -->
+                <div class="feedback-grid">
+                    <div class="feedback-box">
+                        <span class="feedback-label">System Status</span>
+                        <div id="voice-status" class="feedback-value status-idle">Voice control inactive (Click button to speak)</div>
+                    </div>
+                    <div class="feedback-box">
+                        <span class="feedback-label">Heard Transcript</span>
+                        <div id="voice-transcript" class="feedback-value">—</div>
+                    </div>
+                    <div class="feedback-box">
+                        <span class="feedback-label">Executed Visualization Action</span>
+                        <div id="voice-action" class="feedback-value">Showing all Top 50 economies</div>
+                    </div>
+                </div>
+
+                <!-- 错误提示与推荐指令提示框 -->
+                <div id="command-error-banner" class="error-banner hidden"></div>
+
+                <!-- 语音指令使用指南 -->
+                <div class="instructions-panel">
+                    <strong>How to Use Voice Commands (Examples):</strong>
+                    <div class="chip-group">
+                        <span class="cmd-chip" data-cmd="show asia">🗣️ "Show Asia"</span>
+                        <span class="cmd-chip" data-cmd="show europe">🗣️ "Show Europe"</span>
+                        <span class="cmd-chip" data-cmd="show americas">🗣️ "Show Americas"</span>
+                        <span class="cmd-chip" data-cmd="show top 10">🗣️ "Show Top 10"</span>
+                        <span class="cmd-chip" data-cmd="highlight china">🗣️ "Highlight China"</span>
+                        <span class="cmd-chip" data-cmd="highlight united states">🗣️ "Highlight United States"</span>
+                        <span class="cmd-chip" data-cmd="highlight singapore">🗣️ "Highlight Singapore"</span>
+                        <span class="cmd-chip" data-cmd="reset">🗣️ "Reset"</span>
+                    </div>
+                    <small class="chip-hint">💡 Tip: Click "Start Voice Control" and speak clearly in English, or click any example chip above to simulate the voice command directly.</small>
+                </div>
+
+                <!-- 传统控件回退 (Fallback Controls - Part C) -->
+                <div class="fallback-controls">
+                    <div class="fallback-title">Conventional Fallback Controls (Mouse / Keyboard):</div>
+                    <div class="control-row">
+                        <label for="region-select">Filter Region / Tier:</label>
+                        <select id="region-select">
+                            <option value="ALL">All Regions (Top 50)</option>
+                            <option value="Asia">Asia</option>
+                            <option value="Europe">Europe</option>
+                            <option value="Americas">Americas</option>
+                            <option value="Middle East & Africa">Middle East &amp; Africa</option>
+                            <option value="Oceania">Oceania</option>
+                            <option value="TOP5">Top 5 Economies</option>
+                            <option value="TOP10">Top 10 Economies</option>
+                        </select>
+
+                        <label for="country-select">Highlight Country:</label>
+                        <select id="country-select">
+                            <option value="">-- Select a Country --</option>
+                        </select>
+
+                        <button id="reset-button" class="secondary-btn" type="button">Reset View</button>
+                    </div>
+                </div>
+
+                <!-- 当前选中/高亮国家的详情横幅 -->
+                <div id="selected-country-banner" class="country-banner hidden"></div>
+            </section>
+
+            <!-- Visualizations Grid (Reused & Extended from Lab 9) -->
+            <div class="grid-container">
+                <!-- Section 2: Choropleth Map -->
+                <section class="card viz-card">
+                    <h2>2. 2025 GDP Choropleth Map</h2>
+                    <p class="caption">
+                        Color encodes 2025 nominal GDP (log scale). Supports voice-driven regional zoom/filter, country highlighting, or conventional mouse pan/zoom/click.
+                    </p>
+                    <div id="choropleth" class="viz-wrapper">
+                        <div class="loading-indicator">Loading geographic map...</div>
+                    </div>
+                    <div class="card-footer-note">
+                        <strong>Scale &amp; Interaction Note:</strong> A logarithmic color scale stretches visual variance evenly across orders of magnitude ($300B–$30.8T). Voice commands automatically pan and zoom the projection to the target region or country.
+                    </div>
+                </section>
+
+                <!-- Section 3: Cartogram -->
+                <section class="card viz-card">
+                    <h2>3. 2025 GDP Cartogram (Dorling Area Encoding)</h2>
+                    <p class="caption">
+                        Circle area is strictly proportional to 2025 nominal GDP. Synchronized with voice commands and choropleth hover/click selection.
+                    </p>
+                    <div id="cartogram" class="viz-wrapper">
+                        <div class="loading-indicator">Loading cartogram...</div>
+                    </div>
+                    <div class="card-footer-note">
+                        <strong>Coordinated Highlighting:</strong> When a country or region is triggered via voice or fallback controls, corresponding Dorling circles highlight and elevate in unison with the choropleth polygons.
+                    </div>
+                </section>
+            </div>
+
+            <!-- Section 4: Design Reflection (Part E: 严格 100-200 词) -->
+            <section id="design-reflection" class="card">
+                <h2>4. Design Reflection (Part E)</h2>
+                <div class="essay-content">
+                    <p>
+                        I extended my Lab 9 geospatial visualization comparing 2025 nominal GDP across a choropleth map and a Dorling cartogram by integrating browser-based voice interaction via the Web Speech API. The voice interface supports three primary visual exploration tasks: filtering economies by continental region or rank tier (e.g., "Show Asia", "Show Top 10"), locating and highlighting specific nations across both coordinated views (e.g., "Highlight Singapore"), and resetting the viewport ("Reset").
+                    </p>
+                    <p>
+                        Voice interaction is suitable for this dual-map visualization because compact high-GDP economies like Singapore, Switzerland, or Ireland occupy minuscule geographic polygons on the choropleth. These make them not very easy to hunt down and click manually. Speaking a country's name directly bypasses spatial search friction, immediately cross-highlighting both its geographic boundary and its inflated cartogram bubble while zooming the map.
+                    </p>
+                    <p>
+                        During testing, I observed several limitations: background noise and pronunciation variations occasionally caused homophone transcription errors and the Web Speech API lacks uniform support across all browsers. To mitigate these issues, I implemented fuzzy keyword matching, clear visual transcript and status feedback, explicit click-to-listen microphone activation for privacy and conventional dropdown and button fallback controls.
+                    </p>
+                </div>
+            </section>
+
+            <p class="back-link"><a href="../index.html">← Back to home</a></p>
+        </main>
+    </div>
+
+    <!-- Shared Tooltip -->
+    <div id="tooltip" class="tooltip"></div>
+
+    <script src="lab10.js"></script>
 </body>
 </html>
